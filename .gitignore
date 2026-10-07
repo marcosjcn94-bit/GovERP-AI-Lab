@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest_runtime/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Local configuration and data
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.db
+/data/
+/backups/
+# Frontend
+node_modules/
+dist/
+# Runtime
+*.log
+/.runtime/
+
+# Generated build metadata
+*.tsbuildinfo
+*.egg-info/

@@ -1,0 +1,22 @@
+services:
+  database:
+    image: pgvector/pgvector:pg18-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: goverp_owner
+      POSTGRES_PASSWORD: ${GOVERP_PG_OWNER_PASSWORD:?Run scripts/bootstrap.ps1 first}
+      POSTGRES_DB: goverp
+      GOVERP_APP_PASSWORD: ${GOVERP_PG_APP_PASSWORD:?Run scripts/bootstrap.ps1 first}
+    ports:
+      - "127.0.0.1:5440:5432"
+    volumes:
+      - goverp_data:/var/lib/postgresql
+      - ./docker/init-app-role.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goverp_owner -d goverp"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  goverp_data:
