@@ -5,12 +5,18 @@ if ($ProjectName -notmatch '^goverp-e2e-[a-f0-9]{12}$') { throw 'Projeto Compose
 $repo = Resolve-Path (Join-Path $PSScriptRoot '..')
 Set-Location $repo
 $runtime = Join-Path $repo '.runtime'
+$pythonPath = if ($IsWindows) {
+    Join-Path $repo '.venv\Scripts\python.exe'
+} else {
+    Join-Path $repo '.venv/bin/python'
+}
+if (-not (Test-Path $pythonPath)) { throw 'Python do ambiente uv não encontrado.' }
 $projectArgs = @('--env-file', '.env.example', '-f', 'docker-compose.e2e.yml', '-p', $ProjectName)
 $api = $null
 $web = $null
 $report = [ordered]@{ measured_at_utc = [DateTime]::UtcNow.ToString('o'); database_restart = $false; first_request = $false; request_after_restart = $false }
 try {
-    $api = Start-Process -FilePath (Join-Path $repo '.venv\Scripts\python.exe') -ArgumentList @('-m', 'uvicorn', 'gov_erp.api:app', '--app-dir', 'src', '--host', '127.0.0.1', '--port', '8002', '--no-access-log') -WorkingDirectory $repo -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtime 'recovery-api.stdout.log') -RedirectStandardError (Join-Path $runtime 'recovery-api.stderr.log')
+    $api = Start-Process -FilePath $pythonPath -ArgumentList @('-m', 'uvicorn', 'gov_erp.api:app', '--app-dir', 'src', '--host', '127.0.0.1', '--port', '8002', '--no-access-log') -WorkingDirectory $repo -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtime 'recovery-api.stdout.log') -RedirectStandardError (Join-Path $runtime 'recovery-api.stderr.log')
     $ready = $false
     for ($i = 0; $i -lt 45; $i++) {
         try {
@@ -36,9 +42,9 @@ try {
     & docker compose @projectArgs up -d --wait --wait-timeout 90 database
     if ($LASTEXITCODE -ne 0) { throw 'Banco isolado nao recuperou prontidao apos reinicio.' }
     $report.database_restart = $true
-    & (Join-Path $repo '.venv\Scripts\python.exe') -m gov_erp.migrate
+    & $pythonPath -m gov_erp.migrate
     if ($LASTEXITCODE -ne 0) { throw 'Falha nas migrations apos reiniciar PostgreSQL.' }
-    & (Join-Path $repo '.venv\Scripts\python.exe') -m gov_erp.seed
+    & $pythonPath -m gov_erp.seed
     if ($LASTEXITCODE -ne 0) { throw 'Falha no seed isolado apos reiniciar PostgreSQL.' }
 
     $readyAfterRestart = $false
