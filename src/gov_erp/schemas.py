@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class LoginRequest(BaseModel):
@@ -15,10 +15,20 @@ class AssistantRequest(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
 
+    @field_validator("question", mode="before")
+    @classmethod
+    def trim_question(cls, value: object) -> object:
+        return value.strip() if isinstance(value, str) else value
+
 
 class ReviewRequest(BaseModel):
     decision: Literal["confirmed", "rejected", "needs_information"]
     note: str = Field(min_length=12, max_length=800)
+
+    @field_validator("note", mode="before")
+    @classmethod
+    def trim_note(cls, value: object) -> object:
+        return value.strip() if isinstance(value, str) else value
 
 
 class SessionView(BaseModel):

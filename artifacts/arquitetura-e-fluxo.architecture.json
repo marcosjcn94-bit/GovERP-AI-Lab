@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "GovERP AI Lab · arquitetura e fluxo de dados",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1390,
+      850
+    ]
+  },
+  "components": [
+    {
+      "id": "pessoas",
+      "type": "external",
+      "label": "Usuário",
+      "sublabel": "Gestor, auditor, cidadão",
+      "pos": [
+        40,
+        330
+      ],
+      "size": [
+        160,
+        76
+      ]
+    },
+    {
+      "id": "interface",
+      "type": "frontend",
+      "label": "React + Vite",
+      "sublabel": "Navegador · :5173",
+      "pos": [
+        260,
+        330
+      ],
+      "size": [
+        180,
+        76
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "FastAPI",
+      "sublabel": "HTTP local · :8000",
+      "pos": [
+        520,
+        330
+      ],
+      "size": [
+        180,
+        76
+      ]
+    },
+    {
+      "id": "acesso",
+      "type": "security",
+      "label": "Sessão e autorização",
+      "sublabel": "Perfil, município, CSRF",
+      "pos": [
+        510,
+        70
+      ],
+      "size": [
+        200,
+        76
+      ]
+    },
+    {
+      "id": "roteador",
+      "type": "backend",
+      "label": "LangGraph",
+      "sublabel": "START → route → END",
+      "tag": "Classifica a intenção",
+      "pos": [
+        820,
+        70
+      ],
+      "size": [
+        200,
+        76
+      ]
+    },
+    {
+      "id": "servicos",
+      "type": "backend",
+      "label": "Serviços de domínio",
+      "sublabel": "Relatório, auditoria, busca",
+      "pos": [
+        820,
+        330
+      ],
+      "size": [
+        210,
+        76
+      ]
+    },
+    {
+      "id": "persistencia",
+      "type": "database",
+      "label": "PostgreSQL + pgvector",
+      "sublabel": "Docker · :5440 → :5432",
+      "tag": "RLS + PostgresSaver",
+      "pos": [
+        1160,
+        330
+      ],
+      "size": [
+        210,
+        76
+      ]
+    },
+    {
+      "id": "modelo",
+      "type": "external",
+      "label": "Ollama opcional",
+      "sublabel": "Explicação local · :11434",
+      "tag": "Fallback determinístico",
+      "pos": [
+        820,
+        630
+      ],
+      "size": [
+        210,
+        76
+      ]
+    },
+    {
+      "id": "importacao",
+      "type": "backend",
+      "label": "Importação explícita",
+      "sublabel": "Seed, documentos e CLP",
+      "tag": "Proveniência e versões",
+      "pos": [
+        1160,
+        630
+      ],
+      "size": [
+        210,
+        76
+      ]
+    },
+    {
+      "id": "telemetria",
+      "type": "external",
+      "label": "Observabilidade",
+      "sublabel": "OTel + Grafana · planejado",
+      "tag": "Ainda sem integração",
+      "pos": [
+        500,
+        630
+      ],
+      "size": [
+        220,
+        76
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "uso",
+      "from": "pessoas",
+      "to": "interface",
+      "label": "Interação",
+      "variant": "emphasis"
+    },
+    {
+      "id": "requisicao",
+      "from": "interface",
+      "to": "api",
+      "label": "HTTP /api",
+      "variant": "emphasis"
+    },
+    {
+      "id": "permissao",
+      "from": "api",
+      "to": "acesso",
+      "label": "Valida acesso",
+      "variant": "security"
+    },
+    {
+      "id": "intencao",
+      "from": "api",
+      "to": "roteador",
+      "label": "Pergunta",
+      "variant": "emphasis"
+    },
+    {
+      "id": "execucao",
+      "from": "roteador",
+      "to": "servicos",
+      "label": "Intenção → execução",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "consulta",
+      "from": "servicos",
+      "to": "persistencia",
+      "label": "SQL + RLS",
+      "variant": "emphasis",
+      "labelDx": -38
+    },
+    {
+      "id": "checkpoint",
+      "from": "roteador",
+      "to": "persistencia",
+      "label": "Checkpoint da sessão"
+    },
+    {
+      "id": "explicacao",
+      "from": "servicos",
+      "to": "modelo",
+      "label": "Payload → explicação",
+      "labelDy": 24
+    },
+    {
+      "id": "carga",
+      "from": "importacao",
+      "to": "persistencia",
+      "label": "Carga versionada"
+    },
+    {
+      "id": "sinais",
+      "from": "api",
+      "to": "telemetria",
+      "label": "Planejado: sinais",
+      "variant": "dashed",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Fluxo da consulta",
+      "items": [
+        "API autentica e limita o acesso por perfil e município.",
+        "LangGraph escolhe a intenção; a API executa o serviço e responde JSON."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Dados e rastreabilidade",
+      "items": [
+        "Dados financeiros sintéticos; ranking CLP importado explicitamente.",
+        "PostgreSQL guarda dados, checkpoints e registros de execução."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Limites atuais",
+      "items": [
+        "Ollama é opcional; sua ausência aciona resposta determinística.",
+        "A stack de observabilidade está recomendada e ainda não integrada."
+      ]
+    }
+  ]
+}

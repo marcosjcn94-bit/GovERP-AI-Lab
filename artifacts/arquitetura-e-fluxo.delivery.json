@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\mjcn9\\Desktop\\EQUIPLANO\\artifacts\\arquitetura-e-fluxo.architecture.json",
+  "output": "C:\\Users\\mjcn9\\Desktop\\EQUIPLANO\\artifacts\\arquitetura-e-fluxo.html",
+  "specification": {
+    "sha256": "9e115e620eb3e1ffee7e10c03e1fdb856ca63fe3e4e4aed286bbd5ed7b0a623b",
+    "bytes": 5398
+  },
+  "artifact": {
+    "sha256": "ed52277f7c219d66177f9fbbdba1b47d5a2f55d780db16dc4e8834e604bf5be4",
+    "bytes": 811708
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

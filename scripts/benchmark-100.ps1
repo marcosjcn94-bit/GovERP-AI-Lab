@@ -33,8 +33,6 @@ try {
     $timer = [Diagnostics.Stopwatch]::StartNew()
     & $python -m gov_erp.seed --mode benchmark-100
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao gerar a carga do benchmark.' }
-    & $python -m gov_erp.rankings
-    if ($LASTEXITCODE -ne 0) { throw 'Falha ao importar a referência pública de competitividade.' }
     $timer.Stop()
     $env:GOVERP_BENCHMARK_SEED_SECONDS = [string]$timer.Elapsed.TotalSeconds
     @'
@@ -51,19 +49,23 @@ with engine.connect() as connection:
     municipality_count = connection.scalar(text("SELECT count(*) FROM municipalities"))
     financial_rows = connection.scalar(text("SELECT count(*) FROM financial_transactions"))
     document_rows = connection.scalar(text("SELECT count(*) FROM tenant_documents"))
+report_path = Path("data/benchmark-100-report.json")
+previous_report = json.loads(report_path.read_text(encoding="utf-8")) if report_path.exists() else {}
 report = {
+    **previous_report,
     "database": "goverp_benchmark100",
     "municipalities": municipality_count,
     "financial_rows": financial_rows,
     "documents": document_rows,
     "database_bytes": database_bytes,
     "database_megabytes": round(database_bytes / 1024 / 1024, 2),
+    "measurement_scope": "gov_erp.seed only; includes IBGE fetch, synthetic generation and inserts; excludes migrations and CLP",
     "seed_seconds": round(float(os.environ["GOVERP_BENCHMARK_SEED_SECONDS"]), 2),
     "model_calls": 0,
     "measured_at_utc": datetime.now(UTC).isoformat(),
 }
 Path("data").mkdir(exist_ok=True)
-Path("data/benchmark-100-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2))
 '@ | & $python -
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao medir o banco do benchmark.' }

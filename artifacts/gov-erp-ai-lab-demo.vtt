@@ -1,0 +1,33 @@
+﻿WEBVTT
+
+1
+00:00:00.000 --> 00:00:14.000
+GovERP AI Lab: demonstração local para análise municipal. Esta apresentação usa dados sintéticos.
+
+2
+00:00:14.000 --> 00:00:28.000
+Sessão de Curitiba: os cálculos ficam no backend; o modelo local, quando disponível, apenas organiza explicações.
+
+3
+00:00:28.000 --> 00:00:42.000
+Relatório de despesas pagas: valores e variações determinísticos. Nesta execução o Qwen caiu em fallback após cerca de 67 segundos.
+
+4
+00:00:42.000 --> 00:00:56.000
+A auditoria aponta possíveis duplicidades para revisão humana. Nenhum achado afirma fraude.
+
+5
+00:00:56.000 --> 00:01:10.000
+Ranking CLP 2026: dados publicados com proveniência; a aplicação não recalcula notas e posições.
+
+6
+00:01:10.000 --> 00:01:24.000
+O banco de 100 municípios cresceu cerca de 35 por cento sobre a base funcional de 10, com uma distribuição sintética diferente.
+
+7
+00:01:24.000 --> 00:01:38.000
+O piloto do Qwen falhou nos critérios estritos e seguiu uma instrução injetada. Não confiar em suas afirmações sem validação.
+
+8
+00:01:38.000 --> 00:01:52.000
+Próximos passos: corrigir saída e segurança, repetir holdout, medir latência em carga e revisar respostas por uma pessoa.

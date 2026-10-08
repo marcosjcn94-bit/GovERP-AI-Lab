@@ -1,0 +1,14 @@
+[project]
+name = "goverp-studio"
+version = "0.1.0"
+description = "Ambiente isolado para visualizar o roteador LangGraph do GovERP"
+requires-python = ">=3.12"
+dependencies = [
+  "langgraph>=1.0,<2",
+  "langgraph-cli[inmem]>=0.4,<0.5",
+  "langgraph-api>=0.15.3,<0.16",
+  "colorama>=0.4.6,<0.5 ; sys_platform == 'win32'",
+]
+
+[tool.uv]
+package = false

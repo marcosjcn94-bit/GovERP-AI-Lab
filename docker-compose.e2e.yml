@@ -1,0 +1,19 @@
+services:
+  database:
+    image: pgvector/pgvector:pg18-trixie
+    environment:
+      POSTGRES_USER: goverp_owner
+      POSTGRES_PASSWORD: test-owner-only
+      POSTGRES_DB: goverp_e2e
+      GOVERP_APP_PASSWORD: test-app-only
+    ports:
+      - "127.0.0.1:5441:5432"
+    tmpfs:
+      - /var/lib/postgresql
+    volumes:
+      - ./docker/init-app-role.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goverp_owner -d goverp_e2e"]
+      interval: 2s
+      timeout: 3s
+      retries: 30

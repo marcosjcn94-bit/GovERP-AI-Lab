@@ -11,7 +11,7 @@ from datetime import UTC, date, datetime
 from typing import Annotated
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi import Path as PathParam
 from fastapi.middleware.cors import CORSMiddleware
 from psycopg_pool import ConnectionPool
@@ -36,6 +36,12 @@ from gov_erp.models import (
     Municipality,
     PublicRankingSnapshot,
     TenantDocument,
+)
+from gov_erp.observability import (
+    configure_observability,
+    record_audit_run,
+    record_http_request,
+    record_model_outcome,
 )
 from gov_erp.schemas import AssistantRequest, LoginRequest, ReviewRequest
 from gov_erp.services.reports import paid_department_comparison
@@ -62,7 +68,11 @@ async def lifespan(_: FastAPI):
         session.execute(text("SELECT 1"))
     app_dsn = settings.app_database_url.replace("postgresql+psycopg://", "postgresql://", 1)
     pool = ConnectionPool(
-        app_dsn, kwargs={"autocommit": True, "prepare_threshold": 0}, min_size=1, max_size=4
+        app_dsn,
+        kwargs={"autocommit": True, "prepare_threshold": 0},
+        min_size=1,
+        max_size=4,
+        check=ConnectionPool.check_connection,
     )
     from langgraph.checkpoint.postgres import PostgresSaver
 
@@ -83,6 +93,31 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "X-CSRF-Token"],
 )
+configure_observability(app)
+
+
+@app.middleware("http")
+async def correlate_request(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    request.state.request_id = request_id
+    started = time.perf_counter()
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    route = request.scope.get("route")
+    route_path = route.path if route else "unmatched"
+    duration = max(0, time.perf_counter() - started)
+    record_http_request(request.method, route_path, response.status_code, duration)
+    logger.info(
+        "http_request_completed",
+        extra={
+            "request_id": request_id,
+            "http_method": request.method,
+            "http_route": route_path,
+            "http_status_code": response.status_code,
+            "duration_ms": round(duration * 1000, 2),
+        },
+    )
+    return response
 
 
 def _claims(request: Request) -> tuple[SessionClaims, str]:
@@ -313,6 +348,18 @@ def report_paid_by_department(
     return paid_department_comparison(context["db"], context["claims"].municipality_id, start, end)
 
 
+@app.get("/api/documents/search")
+def document_search(
+    context: CurrentContext,
+    query: str = Query(min_length=3, max_length=512),
+    limit: int = Query(default=5, ge=1, le=10),
+):
+    return {
+        "sources": search_documents(context, query, limit),
+        "source": "versioned_municipal_documents",
+    }
+
+
 @app.get("/api/audits/findings")
 def list_findings(context: CurrentContext, limit: int = 100):
     _require_role(context, "manager", "auditor")
@@ -398,7 +445,13 @@ def run_audit(context: CurrentContext, request: Request):
             )
             created += 1
     session.flush()
-    return {"examined": len(rows), "possible_duplicates": len(matches), "new_findings": created}
+    record_audit_run(len(matches))
+    return {
+        "run_id": request.state.request_id,
+        "examined": len(rows),
+        "possible_duplicates": len(matches),
+        "new_findings": created,
+    }
 
 
 @app.post("/api/audits/findings/{finding_id}/review")
@@ -489,7 +542,11 @@ async def explain_locally(question: str, data: dict[str, object]) -> tuple[str |
             response.raise_for_status()
             message = response.json().get("message", {}).get("content", "").strip()
             return (message[:1600], settings.model_name) if message else (None, None)
-    except (httpx.HTTPError, ValueError):
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning(
+            "model_explanation_fallback",
+            extra={"fallback_cause": type(exc).__name__},
+        )
         return None, None
 
 
@@ -508,10 +565,15 @@ async def assistant(data: AssistantRequest, request: Request, context: CurrentCo
         raise HTTPException(status_code=422, detail="Periodo invalido; limite de 367 dias")
 
     started = time.perf_counter()
+    run_id = request.state.request_id
     graph = getattr(app.state, "question_graph", None) or build_question_graph()
     routed = graph.invoke(
         {"question": question},
-        {"configurable": {"thread_id": context["claims"].nonce}},
+        {
+            "configurable": {"thread_id": context["claims"].nonce},
+            "run_id": uuid.UUID(run_id),
+            "metadata": {"request_id": run_id, "intent_scope": "local_demo"},
+        },
     )
     intent = routed["intent"]
     if intent == "report":
@@ -538,7 +600,8 @@ async def assistant(data: AssistantRequest, request: Request, context: CurrentCo
 
     can_explain = intent == "report" or (intent == "documents" and bool(result.get("sources")))
     explanation, model = await explain_locally(question, result) if can_explain else (None, None)
-    run_id = str(uuid.uuid4())
+    if can_explain:
+        record_model_outcome(model is None)
     result_json = json.dumps(result, sort_keys=True, ensure_ascii=True, default=str)
     session = context["db"]
     session.add(

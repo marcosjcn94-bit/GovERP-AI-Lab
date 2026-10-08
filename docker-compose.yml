@@ -17,6 +17,77 @@ services:
       interval: 5s
       timeout: 5s
       retries: 15
+  otel-collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.162.0
+    profiles: [observability]
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./docker/observability/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+      - "127.0.0.1:13133:13133"
+      - "127.0.0.1:9464:9464"
+    depends_on: [tempo, loki]
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+  prometheus:
+    image: prom/prometheus:v3.8.1
+    profiles: [observability]
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=7d", "--storage.tsdb.retention.size=480MB", "--web.enable-lifecycle"]
+    volumes:
+      - ./docker/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/observability/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on: [otel-collector, blackbox-exporter]
+    tmpfs:
+      - /prometheus:size=512m,mode=1777
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.27.0
+    profiles: [observability]
+    command: ["--config.file=/etc/blackbox/blackbox.yml"]
+    volumes:
+      - ./docker/observability/prometheus/blackbox.yml:/etc/blackbox/blackbox.yml:ro
+    expose: ["9115"]
+  tempo:
+    image: grafana/tempo:2.9.0
+    profiles: [observability]
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./docker/observability/tempo/tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "127.0.0.1:3200:3200"
+    expose: ["4317"]
+    tmpfs:
+      - /var/tempo:size=512m,mode=1777
+  loki:
+    image: grafana/loki:3.6.0
+    profiles: [observability]
+    command: ["-config.file=/etc/loki/config.yaml"]
+    volumes:
+      - ./docker/observability/loki/config.yaml:/etc/loki/config.yaml:ro
+    ports:
+      - "127.0.0.1:3100:3100"
+    tmpfs:
+      - /loki:size=256m,mode=1777
+  grafana:
+    image: grafana/grafana:12.3.0
+    profiles: [observability]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GOVERP_GRAFANA_PASSWORD:?Set GOVERP_GRAFANA_PASSWORD in the local .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ./docker/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on: [prometheus, tempo, loki]
+    tmpfs:
+      - /var/lib/grafana:size=128m,mode=1777
 
 volumes:
   goverp_data:

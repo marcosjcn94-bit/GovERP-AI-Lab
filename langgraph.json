@@ -1,0 +1,14 @@
+{
+  "dependencies": ["./studio"],
+  "graphs": {
+    "question_router": "./src/gov_erp/workflow.py:question_graph"
+  },
+  "env": {
+    "LANGSMITH_TRACING": "true",
+    "LANGSMITH_PROJECT": "goverp-ai-lab-local",
+    "LANGSMITH_ENDPOINT": "https://api.smith.langchain.com",
+    "LANGSMITH_HIDE_INPUTS": "true",
+    "LANGSMITH_HIDE_OUTPUTS": "true",
+    "LANGSMITH_HIDE_METADATA": "true"
+  }
+}

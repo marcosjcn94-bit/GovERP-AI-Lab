@@ -1,0 +1,39 @@
+groups:
+  - name: goverp-local
+    rules:
+      - alert: GovERPApiUnavailable
+        expr: probe_success{job="api-readiness"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: API local nao responde no endpoint de prontidao
+      - alert: GovERPHighServerErrorRate
+        expr: |
+          (sum(increase(goverp_http_requests_total{http_status_code=~"5.."}[5m]))
+          / clamp_min(sum(increase(goverp_http_requests_total[5m])), 1)) > 0.05
+          and sum(increase(goverp_http_requests_total[5m])) >= 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Mais de 5 por cento de erros 5xx com pelo menos 20 requisicoes
+      - alert: GovERPHighP95Latency
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(goverp_http_request_duration_seconds_bucket[5m]))) > 30
+          and sum(increase(goverp_http_requests_total[5m])) >= 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Latencia p95 acima de 30 segundos com amostra minima
+      - alert: GovERPHighModelFallbackRate
+        expr: |
+          (sum(increase(goverp_model_explanations_total{fallback="true"}[5m]))
+          / clamp_min(sum(increase(goverp_model_explanations_total[5m])), 1)) > 0.5
+          and sum(increase(goverp_model_explanations_total[5m])) >= 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Mais da metade das explicacoes locais terminou em fallback

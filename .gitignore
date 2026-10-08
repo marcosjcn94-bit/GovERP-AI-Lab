@@ -22,6 +22,8 @@ dist/
 # Runtime
 *.log
 /.runtime/
+/.langgraph_api/
+/.playwright-mcp/
 
 # Generated build metadata
 *.tsbuildinfo

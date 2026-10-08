@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     session_secret: str = ""
     model_url: str = "http://127.0.0.1:11434"
     model_name: str = "qwen3:4b"
-    model_timeout_seconds: float = Field(default=120, ge=1, le=180)
+    model_timeout_seconds: float = Field(default=30, ge=1, le=180)
     allowed_origin: str = "http://127.0.0.1:5173"
 
 
