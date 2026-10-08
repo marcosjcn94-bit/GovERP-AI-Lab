@@ -16,7 +16,18 @@ $api = $null
 $web = $null
 $report = [ordered]@{ measured_at_utc = [DateTime]::UtcNow.ToString('o'); database_restart = $false; first_request = $false; request_after_restart = $false }
 try {
-    $api = Start-Process -FilePath $pythonPath -ArgumentList @('-m', 'uvicorn', 'gov_erp.api:app', '--app-dir', 'src', '--host', '127.0.0.1', '--port', '8002', '--no-access-log') -WorkingDirectory $repo -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtime 'recovery-api.stdout.log') -RedirectStandardError (Join-Path $runtime 'recovery-api.stderr.log')
+    $apiStart = @{
+        FilePath = $pythonPath
+        ArgumentList = @('-m', 'uvicorn', 'gov_erp.api:app', '--app-dir', 'src', '--host', '127.0.0.1', '--port', '8002', '--no-access-log')
+        WorkingDirectory = $repo.Path
+        PassThru = $true
+        RedirectStandardOutput = Join-Path $runtime 'recovery-api.stdout.log'
+        RedirectStandardError = Join-Path $runtime 'recovery-api.stderr.log'
+    }
+    if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+        $apiStart.WindowStyle = 'Hidden'
+    }
+    $api = Start-Process @apiStart
     $ready = $false
     for ($i = 0; $i -lt 45; $i++) {
         try {
