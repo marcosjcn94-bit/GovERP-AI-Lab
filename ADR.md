@@ -37,3 +37,10 @@ Registro breve das decisões que afetam arquitetura, segurança e operação do 
 - **Data:** 2026-10-07
 - **Decisão:** Esta execução conclui e valida o projeto local e prepara sua configuração para o repositório GitHub indicado; não publica nem faz push.
 - **Consequências:** CI e Dependabot remotos só serão reportados como configurados até uma execução observada no GitHub.
+
+
+## ADR-007 - CI e Dependabot ativos no GitHub
+
+- **Data:** 2026-10-08
+- **Decisao:** Publicar o projeto no repositorio publico existente marcosjcn94-bit/GovERP-AI-Lab, com CI em push e pull request e atualizacoes semanais do Dependabot para uv, npm e GitHub Actions.
+- **Consequencias:** A branch codex/gov-erp-ai-lab e a branch padrao atual. O CI passou no commit 6c59f9d. Atualizacoes de dependencias exigem checks atuais e revisao; nenhuma PR e mesclada automaticamente. Esta decisao atualiza o estado operacional descrito no ADR-006.

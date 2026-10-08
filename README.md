@@ -105,3 +105,8 @@ Para desativar e parar a stack: `.\scripts\observability.ps1 down`. Para consult
 Oito testes Playwright, 13 testes Python e o build de produ??o passaram. Um smoke test confirmou m?tricas Prometheus, logs Loki e traces Tempo. O PostgreSQL tempor?rio foi reiniciado e a API respondeu antes e depois. O projeto LangSmith recebeu traces com entradas, sa?das e metadados da aplica??o ocultos. Relat?rios sanitizados ficam em `.runtime/`.
 
 O benchmark de 100 munic?pios foi atualizado: 200.000 transa??es, 3.000 documentos, 75,04 MiB e 2,52 s para uma execu??o idempotente do seed. Esse tempo cobre somente `gov_erp.seed` (consulta IBGE, gera??o sint?tica e inserts), exclui migrations e CLP e n?o ? compar?vel diretamente com a medi??o hist?rica de carga completa. O script preserva no relat?rio as medi??es funcionais anteriores.
+
+
+## CI e atualizacoes de dependencias
+
+O repositorio publico executa Quality em pushes e pull requests. O Dependabot verifica semanalmente dependencias Python (uv), npm e GitHub Actions. Revise cada PR e confirme os checks atuais antes de mesclar; atualizacoes nao sao mescladas automaticamente.
