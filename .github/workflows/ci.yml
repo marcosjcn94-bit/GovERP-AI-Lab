@@ -46,6 +46,7 @@ jobs:
           path: |
             .runtime/check-report.json
             .runtime/e2e-report.json
+            .runtime/recovery-report.json
             .runtime/playwright-report
             .runtime/playwright-results
           if-no-files-found: ignore

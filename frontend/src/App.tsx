@@ -1,45 +1,13 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { api, ApiError } from "./api";
 
 type City = { id: string; name: string; uf: string };
 type Session = { user_id: string; display_name: string; role: string; municipality_id: string; municipality_name: string; csrf_token: string };
 type Finding = { id: string; rule_id: string; record_ids: string[]; evidence: Record<string, string>; status: string; review_note?: string };
 type Report = { current_period: { start: string; end: string }; previous_period: { start: string; end: string }; departments: Record<string, { previous: string; current: string; absolute_change: string; percentage_change: string | null }> };
 type DocumentSource = { title: string; excerpt: string; source_url: string; source_hash: string; source_kind: string; vigency_verified: boolean; valid_from: string | null; valid_until: string | null };
-type RunResult = { run_id: string; intent: string; answer: string; model?: string; model_fallback: boolean; result: Record<string, unknown>; human_review_required: boolean };
+type RunResult = { run_id: string; intent: string; answer: string; model?: string; model_fallback: boolean; explanation_status: "deterministic" | "model_validated" | "model_fallback"; result: Record<string, unknown>; human_review_required: boolean };
 type Ranking = { available: boolean; municipality_name?: string; edition_year?: number; population?: number; overall_score?: string; overall_rank?: number; rank_change?: number | null; pillars?: Record<string, { score: number; rank: number; rank_change: number | null }>; source_url: string; source_sha256?: string; message?: string };
-
-async function api<T>(path: string, init: RequestInit = {}, csrf?: string): Promise<T> {
-  const headers = new Headers(init.headers);
-  if (init.body) headers.set("content-type", "application/json");
-  if (csrf) headers.set("x-csrf-token", csrf);
-  const response = await fetch(path, { ...init, headers, credentials: "include" });
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({ detail: "Falha na requisicao local." }));
-    throw new Error(readableError(body.detail) ?? `Erro HTTP ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
-
-function readableError(detail: unknown): string | null {
-  if (typeof detail === "string") return detail;
-  if (Array.isArray(detail)) {
-    return detail.map((item) => {
-      if (typeof item === "string") return item;
-      if (!item || typeof item !== "object") return "Entrada invalida";
-      const error = item as { loc?: unknown[]; msg?: unknown };
-      const field = Array.isArray(error.loc)
-        ? error.loc.filter((part): part is string => typeof part === "string" && part !== "body").join(" → ")
-        : "";
-      const message = typeof error.msg === "string" ? error.msg : "Entrada invalida";
-      return field ? `${field}: ${message}` : message;
-    }).join("; ");
-  }
-  if (detail && typeof detail === "object" && "msg" in detail) {
-    const message = (detail as { msg: unknown }).msg;
-    return typeof message === "string" ? message : null;
-  }
-  return null;
-}
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -59,37 +27,74 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState("Visao geral");
 
+  const scope = useRef({ epoch: 0, controller: new AbortController() });
+
+  function clearSession() {
+    scope.current.controller.abort();
+    scope.current = { epoch: scope.current.epoch + 1, controller: new AbortController() };
+    setSession(null); setResult(null); setFindings([]); setReport(null); setDocuments([]); setRanking(null);
+    setQuestion(""); setDocumentQuery(""); setReportRange({ start: "2025-10-01", end: "2025-12-31" });
+    setTab("Visao geral"); setBusy(false); setError("");
+  }
+
+  async function scopedApi<T>(path: string, init: RequestInit = {}, csrf?: string): Promise<T> {
+    const active = scope.current;
+    try {
+      const value = await api<T>(path, { ...init, signal: active.controller.signal }, csrf);
+      if (active !== scope.current) throw new DOMException("Sessao alterada", "AbortError");
+      return value;
+    } catch (error) {
+      if (active !== scope.current) throw new DOMException("Sessao alterada", "AbortError");
+      if (error instanceof ApiError && error.status === 401 && session) {
+        clearSession(); setError("Sessao expirada. Entre novamente.");
+        throw new DOMException("Sessao expirada", "AbortError");
+      }
+      throw error;
+    }
+  }
+
+  function showError(error: unknown) {
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    setError(error instanceof Error ? error.message : "Requisicao nao concluida.");
+  }
+
   useEffect(() => {
-    api<City[]>("/api/public/municipalities").then((all) => {
+    scopedApi<City[]>("/api/public/municipalities").then((all) => {
       setCities(all);
       setSelectedCity(all.find((city) => city.id === "4106902")?.id ?? all[0]?.id ?? "");
-    }).catch((e: Error) => setError(e.message));
-    api<Omit<Session, "csrf_token"> & { csrf_token: string }>("/api/auth/session")
+    }).catch(showError);
+    scopedApi<Omit<Session, "csrf_token"> & { csrf_token: string }>("/api/auth/session")
       .then(setSession).catch(() => undefined);
+    return () => { scope.current.controller.abort(); scope.current = { epoch: scope.current.epoch + 1, controller: new AbortController() }; };
   }, []);
 
   async function login(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); clearSession(); const epoch = scope.current.epoch; setBusy(true); setError("");
     try {
-      const value = await api<Session>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, municipality_id: selectedCity }) });
+      const value = await scopedApi<Session>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password, municipality_id: selectedCity }) });
       setSession(value); setTab("Visao geral");
-    } catch (e) { setError(e instanceof Error ? e.message : "Nao foi possivel entrar."); }
-    finally { setBusy(false); }
+      setQuestion("Compare as despesas pagas por secretaria e mostre a memoria de calculo.");
+    } catch (e) { showError(e); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   async function logout() {
     if (!session) return;
-    await api("/api/auth/logout", { method: "POST" }, session.csrf_token).catch(() => undefined);
-    setSession(null); setResult(null); setFindings([]);
+    const token = session.csrf_token;
+    clearSession();
+    const epoch = scope.current.epoch; setBusy(true);
+    try { await api("/api/auth/logout", { method: "POST" }, token); }
+    catch { if (epoch === scope.current.epoch) setError("Dados locais limpos; revogacao da sessao no servidor nao confirmada. Tente entrar e sair novamente."); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   async function ask(event: FormEvent) {
     event.preventDefault(); if (!session) return;
     setResult(null);
-    setBusy(true); setError("");
-    try { setResult(await api("/api/assistant", { method: "POST", body: JSON.stringify({ question }) }, session.csrf_token)); }
-    catch (e) { setError(e instanceof Error ? e.message : "Consulta nao concluida."); }
-    finally { setBusy(false); }
+    const epoch = scope.current.epoch; setBusy(true); setError("");
+    try { setResult(await scopedApi("/api/assistant", { method: "POST", body: JSON.stringify({ question }) }, session.csrf_token)); }
+    catch (e) { showError(e); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   async function loadReport(event: FormEvent) {
@@ -103,12 +108,12 @@ export default function App() {
       setError("Informe um periodo valido de ate 367 dias.");
       return;
     }
-    setBusy(true);
+    const epoch = scope.current.epoch; setBusy(true);
     try {
       const parameters = new URLSearchParams({ start: reportRange.start, end: reportRange.end });
-      setReport(await api<Report>(`/api/reports/paid-by-department?${parameters}`));
-    } catch (e) { setError(e instanceof Error ? e.message : "Nao foi possivel consultar o relatorio."); }
-    finally { setBusy(false); }
+      setReport(await scopedApi<Report>(`/api/reports/paid-by-department?${parameters}`));
+    } catch (e) { showError(e); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   async function searchKnowledge(event: FormEvent) {
@@ -121,13 +126,13 @@ export default function App() {
       setError("Digite ao menos tres caracteres para buscar fontes.");
       return;
     }
-    setBusy(true);
+    const epoch = scope.current.epoch; setBusy(true);
     try {
       const parameters = new URLSearchParams({ query, limit: "5" });
-      const result = await api<{ sources: DocumentSource[] }>(`/api/documents/search?${parameters}`);
+      const result = await scopedApi<{ sources: DocumentSource[] }>(`/api/documents/search?${parameters}`);
       setDocuments(result.sources);
-    } catch (e) { setError(e instanceof Error ? e.message : "Nao foi possivel consultar as fontes."); }
-    finally { setBusy(false); }
+    } catch (e) { showError(e); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   async function reviewFinding(event: FormEvent<HTMLFormElement>, findingId: string) {
@@ -139,35 +144,35 @@ export default function App() {
     if (typeof decision !== "string" || typeof note !== "string") return;
     setError("");
     try {
-      await api(`/api/audits/findings/${findingId}/review`, {
+      await scopedApi(`/api/audits/findings/${findingId}/review`, {
         method: "POST",
         body: JSON.stringify({ decision, note }),
       }, session.csrf_token);
       await loadFindings();
-    } catch (e) { setError(e instanceof Error ? e.message : "Nao foi possivel salvar a revisao."); }
+    } catch (e) { showError(e); }
   }
 
   async function loadFindings() {
     if (!session) return;
-    try { setFindings(await api<Finding[]>("/api/audits/findings")); }
-    catch (e) { setFindings([]); setError(e instanceof Error ? e.message : "Falha ao carregar auditoria."); }
+    try { setFindings(await scopedApi<Finding[]>("/api/audits/findings")); }
+    catch (e) { showError(e); }
   }
 
   async function loadRanking() {
     if (!session) return;
-    try { setRanking(await api<Ranking>(`/api/public/rankings/${session.municipality_id}`)); }
-    catch (e) { setError(e instanceof Error ? e.message : "Falha ao consultar o ranking publico."); }
+    try { setRanking(await scopedApi<Ranking>(`/api/public/rankings/${session.municipality_id}`)); }
+    catch (e) { showError(e); }
   }
 
   async function runAudit() {
     if (!session) return;
-    setBusy(true); setError("");
+    const epoch = scope.current.epoch; setBusy(true); setError("");
     try {
-      const outcome = await api<{ run_id: string; examined: number; possible_duplicates: number; new_findings: number }>("/api/audits/run", { method: "POST" }, session.csrf_token);
-      setResult({ run_id: outcome.run_id, intent: "audit", answer: `${outcome.possible_duplicates} possiveis duplicidades; ${outcome.new_findings} novos achados. Revise cada evidência.`, model_fallback: true, result: outcome, human_review_required: outcome.possible_duplicates > 0 });
+      const outcome = await scopedApi<{ run_id: string; examined: number; possible_duplicates: number; new_findings: number }>("/api/audits/run", { method: "POST" }, session.csrf_token);
+      setResult({ run_id: outcome.run_id, intent: "audit", answer: `${outcome.possible_duplicates} possiveis duplicidades; ${outcome.new_findings} novos achados. Revise cada evidência.`, model_fallback: false, explanation_status: "deterministic", result: outcome, human_review_required: outcome.possible_duplicates > 0 });
       await loadFindings();
-    } catch (e) { setError(e instanceof Error ? e.message : "Auditoria nao concluida."); }
-    finally { setBusy(false); }
+    } catch (e) { showError(e); }
+    finally { if (epoch === scope.current.epoch) setBusy(false); }
   }
 
   if (!session) return <main className="login-layout">
@@ -224,8 +229,8 @@ export default function App() {
         </section> : <>
         <div className="content-grid">
           <section className="panel ask-panel">
-            <div className="panel-title"><div><span className="sparkle">✳</span><div><b>Assistente municipal</b><small>Respostas ligadas a dados e documentos da cidade selecionada</small></div></div><span className="model-chip">QWEN · LOCAL</span></div>
-            <form onSubmit={ask}><label htmlFor="question">O que voce precisa consultar?</label><textarea id="question" rows={4} maxLength={512} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ex.: Compare despesas pagas do ultimo trimestre por secretaria."/><div className="prompt-bottom"><span>O calculo fica no backend. O modelo apenas organiza a explicacao.</span><button disabled={busy}>{busy ? "Consultando..." : "Consultar  →"}</button></div></form>
+            <div className="panel-title"><div><span className="sparkle">✳</span><div><b>Assistente municipal</b><small>Respostas ligadas a dados e documentos da cidade selecionada</small></div></div><span className="model-chip">IA OPCIONAL</span></div>
+            <form onSubmit={ask}><label htmlFor="question">O que voce precisa consultar?</label><textarea id="question" rows={4} maxLength={512} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ex.: Compare despesas pagas do ultimo trimestre por secretaria."/><div className="prompt-bottom"><span>O calculo fica no backend. O modelo seleciona apenas fatos aprovados.</span><button disabled={busy}>{busy ? "Consultando..." : "Consultar  →"}</button></div></form>
             {error && <p className="error" role="alert">{error}</p>}
             <div className="suggestions"><small>SUGESTOES</small><button onClick={() => setQuestion("Compare as despesas pagas por secretaria e mostre a memoria de calculo.")}>Despesas pagas no trimestre <span>↗</span></button><button onClick={() => setQuestion("Quais pagamentos precisam de revisao e por que?")}>Achados que precisam de revisao <span>↗</span></button><button onClick={() => { setQuestion("ISS"); setTab("Conhecimento"); }}>Localizar fonte e vigencia <span>↗</span></button></div>
           </section>
@@ -236,7 +241,7 @@ export default function App() {
             {result && !Array.isArray(result.result.sources) && <div className="erp-source"><span className="source-symbol">▤</span><div><b>ERP demonstrativo</b><small>Base sintetica · sem registros reais</small><small>Periodo: {String((result.result.current_period as { start?: string } | undefined)?.start ?? "2025-10-01")} a {String((result.result.current_period as { end?: string } | undefined)?.end ?? "2025-12-31")}</small><small>ID da execucao: {result.run_id.slice(0, 12)}</small></div></div>}
           </section>
         </div>
-        {result && <section className="panel result-panel"><div className="result-heading"><div><p className="eyebrow">RESULTADO · {result.intent.toUpperCase()}</p><h2>{result.answer}</h2><span className="muted">{result.model ? `Explicacao local: ${result.model}` : "Explicacao deterministica · modelo local indisponivel"}</span></div>{result.human_review_required && <span className="review-tag">Revisao humana pendente</span>}</div>
+        {result && <section className="panel result-panel"><div className="result-heading"><div><p className="eyebrow">RESULTADO · {result.intent.toUpperCase()}</p><h2>{result.answer}</h2><span className="muted">{result.explanation_status === "model_validated" ? `Composicao assistida validada: ${result.model}` : result.explanation_status === "model_fallback" ? "Resumo deterministico · fallback do modelo" : "Resumo deterministico"}</span></div>{result.human_review_required && <span className="review-tag">Revisao humana pendente</span>}</div>
           {result.intent === "report" && <div className="table-wrap"><table><thead><tr><th>Secretaria</th><th>Trimestre anterior</th><th>Trimestre atual</th><th>Variacao</th><th>Variacao %</th></tr></thead><tbody>{Object.entries((result.result.departments ?? {}) as Record<string, { previous: string; current: string; absolute_change: string; percentage_change: string | null }>).map(([name, row]) => <tr key={name}><td>{name}</td><td>{money(row.previous)}</td><td>{money(row.current)}</td><td>{money(row.absolute_change)}</td><td>{row.percentage_change === null ? "N/A: sem base positiva" : `${row.percentage_change}%`}</td></tr>)}</tbody></table></div>}
           {result.intent === "audit" && <p className="muted">{JSON.stringify(result.result)} Nenhum alerta determina fraude, bloqueio de pagamento ou recuperacao.</p>}
         </section>}
@@ -248,7 +253,7 @@ export default function App() {
           {ranking?.available && <>
             <p className="muted">{ranking.municipality_name} · populacao de referencia {ranking.population?.toLocaleString("pt-BR")} · posicao geral {ranking.overall_rank} · nota {Number(ranking.overall_score).toFixed(2)}. Delta de posicao: {ranking.rank_change ?? "nao comparavel"}.</p>
             <div className="table-wrap"><table><thead><tr><th>Pilar</th><th>Nota CLP</th><th>Posicao</th><th>Delta</th></tr></thead><tbody>{Object.entries(ranking.pillars ?? {}).map(([name, item]) => <tr key={name}><td>{name}</td><td>{item.score.toFixed(2)}</td><td>{item.rank}</td><td>{item.rank_change ?? "nao comparavel"}</td></tr>)}</tbody></table></div>
-            <p className="muted">Dados importados da planilha oficial; esta aplicacao nao recalcula notas ou posicoes. SHA-256: {ranking.source_sha256}</p>
+            <p className="muted">Dados importados da planilha oficial; esta aplicacao nao recalcula notas ou posicoes.</p><code className="source-hash">SHA-256: {ranking.source_sha256}</code>
             <a href={ranking.source_url} target="_blank" rel="noreferrer">Abrir planilha do CLP</a>
           </>}
         </section>}

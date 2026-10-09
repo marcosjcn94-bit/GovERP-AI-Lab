@@ -44,3 +44,27 @@ Registro breve das decisões que afetam arquitetura, segurança e operação do 
 - **Data:** 2026-10-08
 - **Decisao:** Publicar o projeto no repositorio publico existente marcosjcn94-bit/GovERP-AI-Lab, com CI em push e pull request e atualizacoes semanais do Dependabot para uv, npm e GitHub Actions.
 - **Consequencias:** A branch codex/gov-erp-ai-lab e a branch padrao atual. O CI passou no commit 6c59f9d. Atualizacoes de dependencias exigem checks atuais e revisao; nenhuma PR e mesclada automaticamente. Esta decisao atualiza o estado operacional descrito no ADR-006.
+
+## ADR-008 — Modelo opcional seleciona somente fatos aprovados
+
+- **Data:** 2026-10-09
+- **Decisão:** Desabilitado por padrão, Qwen recebe fatos e retorna somente IDs; o backend valida e monta o texto. Uma tentativa em até 20 segundos, sem pergunta original ou documento completo. Auditoria e ausência de fontes são determinísticas.
+- **Consequências:** Saída inválida nunca vira texto exibido. Estados deterministic/model_validated/model_fallback distinguem ausência de chamada e falha. O piloto real teve 0/12 aceitos por timeout; fallback não conta como sucesso do modelo.
+
+## ADR-009 — Geração de sessão e decisão transacional
+
+- **Data:** 2026-10-09
+- **Decisão:** AbortController e geração de sessão protegem respostas atrasadas; logout limpa todo estado municipal imediatamente e informa falha de revogação. SELECT FOR UPDATE serializa revisões do mesmo achado.
+- **Consequências:** Dados não atravessam sessões e uma segunda revisão recebe 409, preservando RLS, perfil e CSRF. Limpeza local não é prova de revogação no servidor.
+
+## ADR-010 — Sinais mínimos e prova operacional isolada
+
+- **Data:** 2026-10-09
+- **Decisão:** Exportar spans HTTP sanitizados e logs de aplicação, com request_id/run_id/trace_id. Retirar spans SQL e de cliente para evitar conteúdo em exceções. Medir também erros, mapeando banco indisponível para 503.
+- **Consequências:** O smoke reutiliza configurações e alerta com serviços temporários separados do banco funcional. Só correlação, falha controlada, firing e resolução comprovam o fluxo; menor detalhe de tracing é um compromisso explícito com minimização de conteúdo.
+
+## ADR-011 — Consolidação autorizada por PR
+
+- **Data:** 2026-10-09
+- **Decisão:** Consolidar as cinco migrações Dependabot e as correções em PR, integrar após Quality aprovado no SHA atual e verificar CI na branch padrão antes de fechar PRs substituídas.
+- **Consequências:** Esta execução tem autorização para publicação e integração GitHub, sem deploy externo. Histórico e revisão humana permanecem separados das evidências automáticas.

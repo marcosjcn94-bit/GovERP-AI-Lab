@@ -14,6 +14,7 @@ $testVariables = @{
     GOVERP_SESSION_SECRET = 'isolated-e2e-session-secret-at-least-32-bytes'
     GOVERP_MODEL_URL = 'http://127.0.0.1:1'
     GOVERP_MODEL_TIMEOUT_SECONDS = '1'
+    GOVERP_MODEL_ENABLED = 'false'
     GOVERP_ALLOWED_ORIGIN = 'http://127.0.0.1:5174'
     LANGSMITH_TRACING = 'false'
     GOVERP_OTEL_ENABLED = 'false'

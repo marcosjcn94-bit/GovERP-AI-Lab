@@ -1,1 +1,9 @@
 *.sh text eol=lf
+artifacts/arquitetura-e-fluxo.architecture.json text eol=lf
+artifacts/arquitetura-e-fluxo.html text eol=lf
+artifacts/arquitetura-e-fluxo.delivery.json text eol=lf
+artifacts/arquitetura-e-fluxo.visual-check.json text eol=lf
+artifacts/architecture-review.json text eol=lf
+artifacts/acceptance-local.json text eol=lf
+artifacts/qwen-restricted-evaluation.json text eol=lf
+tests/fixtures/qwen-heldout.json text eol=lf

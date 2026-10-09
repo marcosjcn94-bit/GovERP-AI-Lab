@@ -17,7 +17,7 @@ test("gestor consulta calculo deterministico com modelo indisponivel e encerra s
   await expect(page.getByRole("table")).toBeVisible();
   await expect(page.getByRole("columnheader", { name: "Trimestre atual" })).toBeVisible();
   await expect(page.getByRole("cell", { name: "Saude", exact: true })).toBeVisible();
-  await expect(page.getByText("Explicacao deterministica · modelo local indisponivel")).toBeVisible();
+  await expect(page.getByText("Resumo deterministico")).toBeVisible();
   await expect(page.getByText("ID da execucao:")).toBeVisible();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await expect(page.getByRole("button", { name: "Acessar demonstracao" })).toBeVisible();
@@ -73,12 +73,12 @@ test("auditor decide achado demonstrativo com justificativa", async ({ page }) =
   await page.getByRole("button", { name: "Acessar demonstracao" }).click();
   await page.getByRole("button", { name: "Controle interno" }).click();
 
-  const finding = page.locator(".finding").first();
+  const finding = page.locator(".finding").filter({ has: page.locator(".review-form") }).first();
   await finding.getByLabel("Decisão da revisão").selectOption("confirmed");
   await finding.getByLabel("Justificativa da decisão").fill("Documentos conferidos pelo auditor.");
   await finding.getByRole("button", { name: "Registrar decisão" }).click();
-  await expect(finding).toContainText("confirmed");
-  await expect(finding).toContainText("Documentos conferidos pelo auditor.");
+  const reviewed = page.locator(".finding").filter({ hasText: "Documentos conferidos pelo auditor." });
+  await expect(reviewed).toContainText("confirmed");
 });
 
 test("gestor pode consultar achados mas nao recebe controles de revisao", async ({ page }) => {

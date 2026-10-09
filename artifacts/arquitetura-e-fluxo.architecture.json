@@ -93,7 +93,8 @@
       "size": [
         210,
         76
-      ]
+      ],
+      "tag": "Executados pela API"
     },
     {
       "id": "persistencia",
@@ -114,8 +115,8 @@
       "id": "modelo",
       "type": "external",
       "label": "Ollama opcional",
-      "sublabel": "Explicação local · :11434",
-      "tag": "Fallback determinístico",
+      "sublabel": "Qwen · seleção de fact_ids",
+      "tag": "Validação + fallback",
       "pos": [
         820,
         630
@@ -144,14 +145,29 @@
       "id": "telemetria",
       "type": "external",
       "label": "Observabilidade",
-      "sublabel": "OTel + Grafana · planejado",
-      "tag": "Ainda sem integração",
+      "sublabel": "OTel + Grafana · opcional",
+      "tag": "request_id + trace_id",
       "pos": [
         500,
         630
       ],
       "size": [
         220,
+        76
+      ]
+    },
+    {
+      "id": "langsmith",
+      "type": "cloud",
+      "label": "LangSmith externo",
+      "sublabel": "Entradas e saídas ocultas",
+      "tag": "Tracing opcional",
+      "pos": [
+        1160,
+        70
+      ],
+      "size": [
+        210,
         76
       ]
     }
@@ -187,12 +203,11 @@
     },
     {
       "id": "execucao",
-      "from": "roteador",
+      "from": "api",
       "to": "servicos",
-      "label": "Intenção → execução",
+      "label": "Executa domínio",
       "variant": "emphasis",
-      "fromSide": "bottom",
-      "toSide": "top"
+      "labelDy": 28
     },
     {
       "id": "consulta",
@@ -212,7 +227,7 @@
       "id": "explicacao",
       "from": "servicos",
       "to": "modelo",
-      "label": "Payload → explicação",
+      "label": "Fatos → IDs válidos",
       "labelDy": 24
     },
     {
@@ -225,9 +240,14 @@
       "id": "sinais",
       "from": "api",
       "to": "telemetria",
-      "label": "Planejado: sinais",
-      "variant": "dashed",
+      "label": "OTLP sanitizado",
       "labelDy": 24
+    },
+    {
+      "id": "trace-externo",
+      "from": "roteador",
+      "to": "langsmith",
+      "label": "Trace ocultado"
     }
   ],
   "cards": [
@@ -244,15 +264,15 @@
       "title": "Dados e rastreabilidade",
       "items": [
         "Dados financeiros sintéticos; ranking CLP importado explicitamente.",
-        "PostgreSQL guarda dados, checkpoints e registros de execução."
+        "PostgreSQL guarda dados, checkpoints e revisões serializadas."
       ]
     },
     {
       "dot": "amber",
       "title": "Limites atuais",
       "items": [
-        "Ollama é opcional; sua ausência aciona resposta determinística.",
-        "A stack de observabilidade está recomendada e ainda não integrada."
+        "Qwen desabilitado por padrão; saída inválida aciona fallback.",
+        "OTel opcional: métricas, logs, traces e alertas; dados mínimos."
       ]
     }
   ]
