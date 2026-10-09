@@ -6,8 +6,18 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from gov_erp.settings import settings
 
-owner_engine = create_engine(settings.owner_database_url, pool_pre_ping=True)
-app_engine = create_engine(settings.app_database_url, pool_pre_ping=True)
+owner_engine = create_engine(
+    settings.owner_database_url,
+    pool_pre_ping=True,
+    pool_timeout=5,
+    connect_args={"connect_timeout": 3},
+)
+app_engine = create_engine(
+    settings.app_database_url,
+    pool_pre_ping=True,
+    pool_timeout=5,
+    connect_args={"connect_timeout": 3},
+)
 OwnerSession = sessionmaker(owner_engine, expire_on_commit=False)
 AppSession = sessionmaker(app_engine, expire_on_commit=False)
 

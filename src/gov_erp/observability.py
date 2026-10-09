@@ -12,6 +12,14 @@ _audit_runs: Any = None
 _audit_findings: Any = None
 
 
+def redact_request(span: Any, scope: dict[str, Any]) -> None:
+    if span and span.is_recording():
+        path = scope.get("path", "/")
+        for key in ("http.url", "http.target", "url.full", "url.path"):
+            span.set_attribute(key, path)
+        span.set_attribute("url.query", "[REDACTED]")
+
+
 def configure_observability(app: Any) -> bool:
     """Enable bounded, content-free OTLP export only when explicitly requested."""
     if os.getenv("GOVERP_OTEL_ENABLED", "false").casefold() != "true":
@@ -22,9 +30,7 @@ def configure_observability(app: Any) -> bool:
     from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
     from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-    from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
     from opentelemetry.instrumentation.logging import LoggingInstrumentor
-    from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
     from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
     from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
     from opentelemetry.sdk.metrics import MeterProvider
@@ -32,8 +38,6 @@ def configure_observability(app: Any) -> bool:
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor
-
-    from gov_erp.database import app_engine
 
     resource = Resource.create({"service.name": "goverp-api", "deployment.environment": "local"})
     tracer_provider = TracerProvider(resource=resource)
@@ -60,18 +64,15 @@ def configure_observability(app: Any) -> bool:
     request_logger.addHandler(LoggingHandler(level=logging.INFO, logger_provider=logger_provider))
     LoggingInstrumentor().instrument(set_logging_format=False)
 
-    def redact_query(span: Any, scope: dict[str, Any]) -> None:
-        if span and span.is_recording() and scope.get("query_string"):
-            span.set_attribute("url.query", "[REDACTED]")
-
     FastAPIInstrumentor.instrument_app(
         app,
-        server_request_hook=redact_query,
+        server_request_hook=redact_request,
         excluded_urls=r"/health/(live|ready)",
-        http_capture_headers_sanitize_fields=[r".*cookie.*", r".*authorization.*", r"x-csrf-token"],
+        http_capture_headers_sanitize_fields=[r".*"],
+        exclude_spans=["receive", "send"],
     )
-    SQLAlchemyInstrumentor().instrument(engine=app_engine)
-    HTTPXClientInstrumentor().instrument()
+    # SQL/client exception events can contain statements, DSNs or query strings.
+    # Keep only content-free server spans and explicitly authored application signals.
     _providers.extend([tracer_provider, meter_provider, logger_provider])
     return True
 

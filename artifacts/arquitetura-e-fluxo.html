@@ -5162,13 +5162,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <path data-edge-from="pessoas" data-edge-to="interface" data-edge-label="Interação" data-edge-key="0" data-edge-id="uso" data-composition-points="200,368;260,368" d="M 200 368 L 260 368" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="interface" data-edge-to="api" data-edge-label="HTTP /api" data-edge-key="1" data-edge-id="requisicao" data-composition-points="440,368;520,368" d="M 440 368 L 520 368" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="api" data-edge-to="acesso" data-edge-label="Valida acesso" data-edge-key="2" data-edge-id="permissao" data-composition-points="610,330;610,146" d="M 610 330 L 610 146" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
-        <path data-edge-from="api" data-edge-to="roteador" data-edge-label="Pergunta" data-edge-key="3" data-edge-id="intencao" data-composition-points="700,368;760,368;760,108;820,108" d="M 700 368 L 752 368 Q 760 368 760 360 L 760 116 Q 760 108 768 108 L 820 108" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="roteador" data-edge-to="servicos" data-edge-label="Intenção → execução" data-edge-key="4" data-edge-id="execucao" data-composition-points="920,146;920,170;941,170;941,306;925,306;925,330" d="M 920 146 L 920 162 Q 920 170 928 170 L 933 170 Q 941 170 941 178 L 941 298 Q 941 306 933 306 L 933 306 Q 925 306 925 314 L 925 330" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="api" data-edge-to="roteador" data-edge-label="Pergunta" data-edge-key="3" data-edge-id="intencao" data-composition-points="700,361;760,361;760,108;820,108" d="M 700 361 L 752 361 Q 760 361 760 353 L 760 116 Q 760 108 768 108 L 820 108" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="api" data-edge-to="servicos" data-edge-label="Executa domínio" data-edge-key="4" data-edge-id="execucao" data-composition-points="700,375;820,375" d="M 700 375 L 820 375" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="servicos" data-edge-to="persistencia" data-edge-label="SQL + RLS" data-edge-key="5" data-edge-id="consulta" data-composition-points="1030,375;1160,375" d="M 1030 375 L 1160 375" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="roteador" data-edge-to="persistencia" data-edge-label="Checkpoint da sessão" data-edge-key="6" data-edge-id="checkpoint" data-composition-points="1020,108;1090,108;1090,361;1160,361" d="M 1020 108 L 1082 108 Q 1090 108 1090 116 L 1090 353 Q 1090 361 1098 361 L 1160 361" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="servicos" data-edge-to="modelo" data-edge-label="Payload → explicação" data-edge-key="7" data-edge-id="explicacao" data-composition-points="925,406;925,630" d="M 925 406 L 925 630" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="roteador" data-edge-to="persistencia" data-edge-label="Checkpoint da sessão" data-edge-key="6" data-edge-id="checkpoint" data-composition-points="1020,115;1090,115;1090,361;1160,361" d="M 1020 115 L 1082 115 Q 1090 115 1090 123 L 1090 353 Q 1090 361 1098 361 L 1160 361" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="servicos" data-edge-to="modelo" data-edge-label="Fatos → IDs válidos" data-edge-key="7" data-edge-id="explicacao" data-composition-points="925,406;925,630" d="M 925 406 L 925 630" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="importacao" data-edge-to="persistencia" data-edge-label="Carga versionada" data-edge-key="8" data-edge-id="carga" data-composition-points="1265,630;1265,406" d="M 1265 630 L 1265 406" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="api" data-edge-to="telemetria" data-edge-label="Planejado: sinais" data-edge-key="9" data-edge-id="sinais" data-composition-points="610,406;610,630" d="M 610 406 L 610 630" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="api" data-edge-to="telemetria" data-edge-label="OTLP sanitizado" data-edge-key="9" data-edge-id="sinais" data-composition-points="610,406;610,630" d="M 610 406 L 610 630" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="roteador" data-edge-to="langsmith" data-edge-label="Trace ocultado" data-edge-key="10" data-edge-id="trace-externo" data-composition-points="1020,101;1160,101" d="M 1020 101 L 1160 101" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
         <!-- Components -->
         <g id="node-pessoas" data-node-id="pessoas" data-node-label="Usuário" tabindex="0" role="button" aria-label="Focus Usuário, Gestor, auditor, cidadão, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Gestor, auditor, cidadão" data-node-context="Architecture component">
@@ -5232,8 +5233,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="920" y="138" class="t-backend" font-size="7" text-anchor="middle">Classifica a intenção</text>
         </g>
 
-        <g id="node-servicos" data-node-id="servicos" data-node-label="Serviços de domínio" tabindex="0" role="button" aria-label="Focus Serviços de domínio, Relatório, auditoria, busca, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Relatório, auditoria, busca" data-node-context="Architecture component">
-          <title>Serviços de domínio · Relatório, auditoria, busca · Architecture component</title>
+        <g id="node-servicos" data-node-id="servicos" data-node-label="Serviços de domínio" tabindex="0" role="button" aria-label="Focus Serviços de domínio, Relatório, auditoria, busca, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Relatório, auditoria, busca" data-node-tag="Executados pela API" data-node-context="Architecture component">
+          <title>Serviços de domínio · Relatório, auditoria, busca · Architecture component · Executados pela API</title>
           <rect x="820" y="330" width="210" height="76" rx="6" class="c-mask"/>
           <rect x="820" y="330" width="210" height="76" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(826 336) scale(0.6875)">
@@ -5241,6 +5242,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           </g>
           <text data-node-label="" data-detail-anchor="" x="925" y="366" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Serviços de domínio</text>
         <text data-detail="context" x="925" y="382" class="t-muted" font-size="9" text-anchor="middle">Relatório, auditoria, busca</text>
+        <text data-detail="fine" x="925" y="398" class="t-backend" font-size="7" text-anchor="middle">Executados pela API</text>
         </g>
 
         <g id="node-persistencia" data-node-id="persistencia" data-node-label="PostgreSQL + pgvector" tabindex="0" role="button" aria-label="Focus PostgreSQL + pgvector, Docker · :5440 → :5432, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="Docker · :5440 → :5432" data-node-tag="RLS + PostgresSaver" data-node-context="Architecture component">
@@ -5256,8 +5258,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="1265" y="398" class="t-database" font-size="7" text-anchor="middle">RLS + PostgresSaver</text>
         </g>
 
-        <g id="node-modelo" data-node-id="modelo" data-node-label="Ollama opcional" tabindex="0" role="button" aria-label="Focus Ollama opcional, Explicação local · :11434, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Explicação local · :11434" data-node-tag="Fallback determinístico" data-node-context="Architecture component">
-          <title>Ollama opcional · Explicação local · :11434 · Architecture component · Fallback determinístico</title>
+        <g id="node-modelo" data-node-id="modelo" data-node-label="Ollama opcional" tabindex="0" role="button" aria-label="Focus Ollama opcional, Qwen · seleção de fact_ids, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Qwen · seleção de fact_ids" data-node-tag="Validação + fallback" data-node-context="Architecture component">
+          <title>Ollama opcional · Qwen · seleção de fact_ids · Architecture component · Validação + fallback</title>
           <rect x="820" y="630" width="210" height="76" rx="6" class="c-mask"/>
           <rect x="820" y="630" width="210" height="76" rx="6" class="c-external" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(826 636) scale(0.6875)">
@@ -5265,8 +5267,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="925" y="666" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Ollama opcional</text>
-        <text data-detail="context" x="925" y="682" class="t-muted" font-size="9" text-anchor="middle">Explicação local · :11434</text>
-        <text data-detail="fine" x="925" y="698" class="t-external" font-size="7" text-anchor="middle">Fallback determinístico</text>
+        <text data-detail="context" x="925" y="682" class="t-muted" font-size="9" text-anchor="middle">Qwen · seleção de fact_ids</text>
+        <text data-detail="fine" x="925" y="698" class="t-external" font-size="7" text-anchor="middle">Validação + fallback</text>
         </g>
 
         <g id="node-importacao" data-node-id="importacao" data-node-label="Importação explícita" tabindex="0" role="button" aria-label="Focus Importação explícita, Seed, documentos e CLP, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Seed, documentos e CLP" data-node-tag="Proveniência e versões" data-node-context="Architecture component">
@@ -5281,8 +5283,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="1265" y="698" class="t-backend" font-size="7" text-anchor="middle">Proveniência e versões</text>
         </g>
 
-        <g id="node-telemetria" data-node-id="telemetria" data-node-label="Observabilidade" tabindex="0" role="button" aria-label="Focus Observabilidade, OTel + Grafana · planejado, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="OTel + Grafana · planejado" data-node-tag="Ainda sem integração" data-node-context="Architecture component">
-          <title>Observabilidade · OTel + Grafana · planejado · Architecture component · Ainda sem integração</title>
+        <g id="node-telemetria" data-node-id="telemetria" data-node-label="Observabilidade" tabindex="0" role="button" aria-label="Focus Observabilidade, OTel + Grafana · opcional, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="OTel + Grafana · opcional" data-node-tag="request_id + trace_id" data-node-context="Architecture component">
+          <title>Observabilidade · OTel + Grafana · opcional · Architecture component · request_id + trace_id</title>
           <rect x="500" y="630" width="220" height="76" rx="6" class="c-mask"/>
           <rect x="500" y="630" width="220" height="76" rx="6" class="c-external" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(506 636) scale(0.6875)">
@@ -5290,8 +5292,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="610" y="666" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Observabilidade</text>
-        <text data-detail="context" x="610" y="682" class="t-muted" font-size="9" text-anchor="middle">OTel + Grafana · planejado</text>
-        <text data-detail="fine" x="610" y="698" class="t-external" font-size="7" text-anchor="middle">Ainda sem integração</text>
+        <text data-detail="context" x="610" y="682" class="t-muted" font-size="9" text-anchor="middle">OTel + Grafana · opcional</text>
+        <text data-detail="fine" x="610" y="698" class="t-external" font-size="7" text-anchor="middle">request_id + trace_id</text>
+        </g>
+
+        <g id="node-langsmith" data-node-id="langsmith" data-node-label="LangSmith externo" tabindex="0" role="button" aria-label="Focus LangSmith externo, Entradas e saídas ocultas, Architecture component" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="Entradas e saídas ocultas" data-node-tag="Tracing opcional" data-node-context="Architecture component">
+          <title>LangSmith externo · Entradas e saídas ocultas · Architecture component · Tracing opcional</title>
+          <rect x="1160" y="70" width="210" height="76" rx="6" class="c-mask"/>
+          <rect x="1160" y="70" width="210" height="76" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(1166 76) scale(0.6875)">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1265" y="106" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LangSmith externo</text>
+        <text data-detail="context" x="1265" y="122" class="t-muted" font-size="9" text-anchor="middle">Entradas e saídas ocultas</text>
+        <text data-detail="fine" x="1265" y="138" class="t-cloud" font-size="7" text-anchor="middle">Tracing opcional</text>
         </g>
 
         <!-- Connection labels -->
@@ -5308,32 +5322,36 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text x="610" y="320" class="t-security" font-size="8" text-anchor="middle">Valida acesso</text>
         </g>
         <g data-detail="context" data-edge-from="api" data-edge-to="roteador" data-edge-label="Pergunta" data-edge-key="3" data-edge-id="intencao">
-          <rect x="735.8" y="218" width="48.4" height="14" rx="3" class="c-mask"/>
-          <text x="760" y="228" class="t-backend" font-size="8" text-anchor="middle">Pergunta</text>
+          <rect x="735.8" y="214.5" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="760" y="224.5" class="t-backend" font-size="8" text-anchor="middle">Pergunta</text>
         </g>
-        <g data-detail="context" data-edge-from="roteador" data-edge-to="servicos" data-edge-label="Intenção → execução" data-edge-key="4" data-edge-id="execucao">
-          <rect x="879.9" y="150" width="101.2" height="14" rx="3" class="c-mask"/>
-          <text x="930.5" y="160" class="t-backend" font-size="8" text-anchor="middle">Intenção → execução</text>
+        <g data-detail="context" data-edge-from="api" data-edge-to="servicos" data-edge-label="Executa domínio" data-edge-key="4" data-edge-id="execucao">
+          <rect x="719" y="383" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="760" y="393" class="t-backend" font-size="8" text-anchor="middle">Executa domínio</text>
         </g>
         <g data-detail="context" data-edge-from="servicos" data-edge-to="persistencia" data-edge-label="SQL + RLS" data-edge-key="5" data-edge-id="consulta">
           <rect x="1030.4" y="355" width="53.199999999999996" height="14" rx="3" class="c-mask"/>
           <text x="1057" y="365" class="t-backend" font-size="8" text-anchor="middle">SQL + RLS</text>
         </g>
         <g data-detail="context" data-edge-from="roteador" data-edge-to="persistencia" data-edge-label="Checkpoint da sessão" data-edge-key="6" data-edge-id="checkpoint">
-          <rect x="1037" y="214.5" width="106" height="14" rx="3" class="c-mask"/>
-          <text x="1090" y="224.5" class="t-muted" font-size="8" text-anchor="middle">Checkpoint da sessão</text>
+          <rect x="1037" y="218" width="106" height="14" rx="3" class="c-mask"/>
+          <text x="1090" y="228" class="t-muted" font-size="8" text-anchor="middle">Checkpoint da sessão</text>
         </g>
-        <g data-detail="context" data-edge-from="servicos" data-edge-to="modelo" data-edge-label="Payload → explicação" data-edge-key="7" data-edge-id="explicacao">
-          <rect x="872" y="410" width="106" height="14" rx="3" class="c-mask"/>
-          <text x="925" y="420" class="t-muted" font-size="8" text-anchor="middle">Payload → explicação</text>
+        <g data-detail="context" data-edge-from="servicos" data-edge-to="modelo" data-edge-label="Fatos → IDs válidos" data-edge-key="7" data-edge-id="explicacao">
+          <rect x="874.4" y="410" width="101.2" height="14" rx="3" class="c-mask"/>
+          <text x="925" y="420" class="t-muted" font-size="8" text-anchor="middle">Fatos → IDs válidos</text>
         </g>
         <g data-detail="context" data-edge-from="importacao" data-edge-to="persistencia" data-edge-label="Carga versionada" data-edge-key="8" data-edge-id="carga">
           <rect x="1221.6" y="610" width="86.8" height="14" rx="3" class="c-mask"/>
           <text x="1265" y="620" class="t-muted" font-size="8" text-anchor="middle">Carga versionada</text>
         </g>
-        <g data-detail="context" data-edge-from="api" data-edge-to="telemetria" data-edge-label="Planejado: sinais" data-edge-key="9" data-edge-id="sinais">
-          <rect x="564.2" y="410" width="91.6" height="14" rx="3" class="c-mask"/>
-          <text x="610" y="420" class="t-messagebus" font-size="8" text-anchor="middle">Planejado: sinais</text>
+        <g data-detail="context" data-edge-from="api" data-edge-to="telemetria" data-edge-label="OTLP sanitizado" data-edge-key="9" data-edge-id="sinais">
+          <rect x="569" y="410" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="610" y="420" class="t-muted" font-size="8" text-anchor="middle">OTLP sanitizado</text>
+        </g>
+        <g data-detail="context" data-edge-from="roteador" data-edge-to="langsmith" data-edge-label="Trace ocultado" data-edge-key="10" data-edge-id="trace-externo">
+          <rect x="1051.4" y="81" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="1090" y="91" class="t-muted" font-size="8" text-anchor="middle">Trace ocultado</text>
         </g>
 
         <!-- Boundary labels (foreground masks keep routes out of titles) -->
@@ -5354,13 +5372,17 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <rect x="245" y="825" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
             <text x="267" y="834" class="t-muted" font-size="10" font-weight="500">Database</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Security" data-legend-x="350" data-legend-baseline="834" data-legend-width="83">
-            <rect x="350" y="825" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="372" y="834" class="t-muted" font-size="10" font-weight="500">Security</text>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud" data-legend-x="350" data-legend-baseline="834" data-legend-width="68">
+            <rect x="350" y="825" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="372" y="834" class="t-muted" font-size="10" font-weight="500">Cloud</text>
           </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="455" data-legend-baseline="834" data-legend-width="83">
-            <rect x="455" y="825" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="477" y="834" class="t-muted" font-size="10" font-weight="500">External</text>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Security" data-legend-x="440" data-legend-baseline="834" data-legend-width="83">
+            <rect x="440" y="825" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="462" y="834" class="t-muted" font-size="10" font-weight="500">Security</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="545" data-legend-baseline="834" data-legend-width="83">
+            <rect x="545" y="825" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="567" y="834" class="t-muted" font-size="10" font-weight="500">External</text>
           </g>
         </g>
       </svg>
@@ -5567,7 +5589,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </div>
         <ul>
           <li>&bull; Dados financeiros sintéticos; ranking CLP importado explicitamente.</li>
-          <li>&bull; PostgreSQL guarda dados, checkpoints e registros de execução.</li>
+          <li>&bull; PostgreSQL guarda dados, checkpoints e revisões serializadas.</li>
         </ul>
       </div>
 
@@ -5577,8 +5599,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Limites atuais</h3>
         </div>
         <ul>
-          <li>&bull; Ollama é opcional; sua ausência aciona resposta determinística.</li>
-          <li>&bull; A stack de observabilidade está recomendada e ainda não integrada.</li>
+          <li>&bull; Qwen desabilitado por padrão; saída inválida aciona fallback.</li>
+          <li>&bull; OTel opcional: métricas, logs, traces e alertas; dados mínimos.</li>
         </ul>
       </div>
     </div>

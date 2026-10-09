@@ -1,0 +1,116 @@
+{
+  "scope": "local acceptance; working tree from df9a585; CI and human review separate",
+  "python_tests": 34,
+  "playwright_tests": 22,
+  "check": {
+    "measured_at_utc": "2026-10-09T17:36:34.9745793Z",
+    "checks": [
+      {
+        "exit_code": 0,
+        "seconds": 1.06,
+        "check": "lint"
+      },
+      {
+        "exit_code": 0,
+        "seconds": 1.231,
+        "check": "format"
+      },
+      {
+        "exit_code": 0,
+        "seconds": 21.299,
+        "check": "tests"
+      },
+      {
+        "exit_code": 0,
+        "seconds": 35.816,
+        "check": "package"
+      },
+      {
+        "exit_code": 0,
+        "seconds": 9.847,
+        "check": "build"
+      }
+    ]
+  },
+  "e2e": {
+    "model_calls": 0,
+    "seconds": 676.465,
+    "cleanup_exit_code": 0,
+    "last_stage": "recovery",
+    "measured_at_utc": "2026-10-09T17:21:32.3923704Z",
+    "status": "passed",
+    "project": "goverp-e2e-6b028ae943d9"
+  },
+  "recovery": {
+    "measured_at_utc": "2026-10-09T17:18:51.3630635Z",
+    "database_restart": true,
+    "first_request": true,
+    "request_after_restart": true
+  },
+  "observability": {
+    "measured_at_utc": "2026-10-09T17:37:08.073527+00:00",
+    "project": "goverp-observe-d28a69d6e70c",
+    "status": "passed",
+    "signal_keys": [
+      [
+        "code_file_path",
+        "code_function_name",
+        "code_line_number",
+        "deployment_environment",
+        "detected_level",
+        "duration_ms",
+        "flags",
+        "http_method",
+        "http_route",
+        "http_status_code",
+        "observed_timestamp",
+        "request_id",
+        "run_id",
+        "scope_name",
+        "service_instance_id",
+        "service_name",
+        "severity_number",
+        "severity_text",
+        "span_id",
+        "telemetry_sdk_language",
+        "telemetry_sdk_name",
+        "telemetry_sdk_version",
+        "trace_id"
+      ]
+    ],
+    "request_id": "e3d48b5a-ce68-4491-ba71-5d868974ef41",
+    "run_id": "e3d48b5a-ce68-4491-ba71-5d868974ef41",
+    "trace_id": "e264ffc8679bfd30688d8ee9cbe396db",
+    "correlated": true,
+    "metric": true,
+    "content_scan": true,
+    "database_503": true,
+    "database_failure_seconds": 3.094,
+    "alert_firing": true,
+    "alert_resolved": true,
+    "recovered": true,
+    "cleanup_exit_code": 0
+  },
+  "model": {
+    "report": "qwen-restricted-evaluation.json",
+    "accepted": 0,
+    "cases": 12,
+    "fallbacks": 12,
+    "reason": "timeout",
+    "human_review": "pending"
+  },
+  "review": {
+    "independent_code_review": "two important findings fixed; regressions RED then GREEN; no minor findings",
+    "human_review": "pending"
+  },
+  "rework": [
+    "CSS import type declaration after TS7 build error",
+    "E2E audit assertion uses unique review note instead of unstable first row",
+    "Redacted legacy http.url after canary leakage",
+    "Bounded PostgreSQL connection timeout after fault request stalled",
+    "Legacy timeout compatibility with effective 20-second cap",
+    "Smoke cleanup survives API wait failure and rejects compose removal failure"
+  ],
+  "billing_cost": "not_measured",
+  "total_elapsed_all_attempts": "not_measured"
+}

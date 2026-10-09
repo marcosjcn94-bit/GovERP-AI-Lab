@@ -5,7 +5,7 @@ if ($ProjectName -notmatch '^goverp-e2e-[a-f0-9]{12}$') { throw 'Projeto Compose
 $repo = Resolve-Path (Join-Path $PSScriptRoot '..')
 Set-Location $repo
 $runtime = Join-Path $repo '.runtime'
-$pythonPath = if ($IsWindows) {
+$pythonPath = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
     Join-Path $repo '.venv\Scripts\python.exe'
 } else {
     Join-Path $repo '.venv/bin/python'

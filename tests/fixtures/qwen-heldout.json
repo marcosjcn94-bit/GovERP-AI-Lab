@@ -1,0 +1,17 @@
+{
+  "version": "qwen-fact-selection-heldout-v1",
+  "cases": [
+    {"id":"h01","intent":"report","result":{"source":"synthetic_erp","departments":{"Saude":{"current":"420.00","previous":"300.00"}}}},
+    {"id":"h02","intent":"report","result":{"source":"synthetic_erp","departments":{"Educacao":{"current":"0.00","previous":"100.00"}}}},
+    {"id":"h03","intent":"report","result":{"source":"synthetic_erp","departments":{"Obras":{"current":"500.00","previous":"0.00"}}}},
+    {"id":"h04","intent":"report","result":{"source":"synthetic_erp","departments":{"Cultura":{"current":"50.01","previous":"50.01"}}}},
+    {"id":"h05","intent":"report","result":{"source":"synthetic_erp","departments":{"Saude":{"current":"150.00","previous":"100.00"},"Obras":{"current":"70.00","previous":"80.00"}}}},
+    {"id":"h06","intent":"report","result":{"source":"synthetic_erp","departments":{"Assistencia":{"current":"1000000.99","previous":"10.00"}}}},
+    {"id":"h07","intent":"report","result":{"source":"synthetic_erp","departments":{"Transporte":{"current":"12.30","previous":"11.99"},"Educacao":{"current":"450.00","previous":"420.00"},"Cultura":{"current":"0.00","previous":"0.00"}}}},
+    {"id":"h08","intent":"report","result":{"source":"synthetic_erp","departments":{"A":{"current":"1.00","previous":"2.00"},"B":{"current":"2.00","previous":"3.00"},"C":{"current":"3.00","previous":"4.00"},"D":{"current":"4.00","previous":"5.00"},"E":{"current":"5.00","previous":"6.00"},"F":{"current":"6.00","previous":"7.00"}}}},
+    {"id":"h09","intent":"documents","result":{"sources":[{"title":"Guia demonstrativo ISS","source_url":"https://example.org/iss","source_kind":"synthetic","vigency_verified":false}]}},
+    {"id":"h10","intent":"documents","result":{"sources":[{"title":"Manual sintetico de iluminacao","source_url":"https://example.org/luz","source_kind":"synthetic","vigency_verified":false}]}},
+    {"id":"h11","intent":"documents","result":{"sources":[{"title":"Referencia sintetica A","source_url":"https://example.org/a","source_kind":"synthetic","vigency_verified":false},{"title":"Referencia sintetica B","source_url":"https://example.org/b","source_kind":"synthetic","vigency_verified":false}]}},
+    {"id":"h12","intent":"documents","result":{"sources":[{"title":"Guia sintetico arquivado","source_url":"https://example.org/arquivo","source_kind":"synthetic","vigency_verified":false}]}}
+  ]
+}

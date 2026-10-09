@@ -1,0 +1,135 @@
+{
+  "measured_at_utc": "2026-10-09T17:00:38.470493+00:00",
+  "dataset_version": "qwen-fact-selection-heldout-v1",
+  "dataset_sha256": "805fb0fb90f10f6a512d2cf3e3b00681e5a369c4bce80125ab54bce91d07e29e",
+  "model": "qwen3:4b",
+  "cases": [
+    {
+      "id": "h01",
+      "status": "model_fallback",
+      "fallback_reason": "timeout",
+      "seconds": 20.063,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h02",
+      "status": "model_fallback",
+      "fallback_reason": "timeout",
+      "seconds": 20.177,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h03",
+      "status": "model_fallback",
+      "fallback_reason": "timeout",
+      "seconds": 20.041,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h04",
+      "status": "model_fallback",
+      "fallback_reason": "timeout",
+      "seconds": 20.026,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h05",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.213,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h06",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.251,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h07",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.154,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h08",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.077,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração."
+    },
+    {
+      "id": "h09",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.256,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração. Vigência não verificada; confira a fonte antes de agir."
+    },
+    {
+      "id": "h10",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.313,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração. Vigência não verificada; confira a fonte antes de agir."
+    },
+    {
+      "id": "h11",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.368,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração. Vigência não verificada; confira a fonte antes de agir."
+    },
+    {
+      "id": "h12",
+      "status": "model_fallback",
+      "fallback_reason": "unavailable",
+      "seconds": 0.34,
+      "calls": 1,
+      "retries": 0,
+      "approved_facts_only": true,
+      "answer": "Resumo determinístico. Dados sintéticos de demonstração. Vigência não verificada; confira a fonte antes de agir."
+    }
+  ],
+  "accepted_compositions": 0,
+  "fallbacks": 12,
+  "calls": 12,
+  "retries": 0,
+  "billing_cost": "not_measured_local_ollama",
+  "human_review": "pending",
+  "scope": "fact-selection contract; no production or semantic quality claim"
+}

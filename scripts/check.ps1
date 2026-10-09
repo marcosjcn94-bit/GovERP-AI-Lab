@@ -13,6 +13,7 @@ $steps = @(
     @{ Name = 'lint'; Command = 'uv'; Arguments = @('run', '--locked', '--extra', 'dev', '--managed-python', 'ruff', 'check', 'src', 'tests') }
     @{ Name = 'format'; Command = 'uv'; Arguments = @('run', '--locked', '--extra', 'dev', '--managed-python', 'ruff', 'format', '--check', 'src', 'tests') }
     @{ Name = 'tests'; Command = 'uv'; Arguments = @('run', '--locked', '--extra', 'dev', '--managed-python', 'pytest', '-q') }
+    @{ Name = 'package'; Command = 'uv'; Arguments = @('build', '--quiet') }
     @{ Name = 'build'; Command = $npmCommand; Arguments = @('--prefix', 'frontend', 'run', 'build') }
 )
 try {
