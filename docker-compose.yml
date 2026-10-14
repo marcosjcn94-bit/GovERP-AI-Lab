@@ -72,7 +72,7 @@ services:
     tmpfs:
       - /loki:size=256m,mode=1777
   grafana:
-    image: grafana/grafana:12.3.0
+    image: grafana/grafana:13.2.4
     profiles: [observability]
     environment:
       GF_SECURITY_ADMIN_USER: admin
