@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["docker-compose"],
+  "prConcurrentLimit": 5,
+  "packageRules": [
+    {
+      "groupName": "non-major container images",
+      "matchManagers": ["docker-compose"],
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+  ]
+}
