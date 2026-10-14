@@ -32,7 +32,7 @@ services:
     tmpfs:
       - /tmp:size=64m,mode=1777
   prometheus:
-    image: prom/prometheus:v3.8.1
+    image: prom/prometheus:v3.15.0
     profiles: [observability]
     command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=7d", "--storage.tsdb.retention.size=480MB", "--web.enable-lifecycle"]
     volumes:
@@ -44,14 +44,14 @@ services:
     tmpfs:
       - /prometheus:size=512m,mode=1777
   blackbox-exporter:
-    image: prom/blackbox-exporter:v0.27.0
+    image: prom/blackbox-exporter:v0.29.0
     profiles: [observability]
     command: ["--config.file=/etc/blackbox/blackbox.yml"]
     volumes:
       - ./docker/observability/prometheus/blackbox.yml:/etc/blackbox/blackbox.yml:ro
     expose: ["9115"]
   tempo:
-    image: grafana/tempo:2.9.0
+    image: grafana/tempo:2.10.8
     profiles: [observability]
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
@@ -62,7 +62,7 @@ services:
     tmpfs:
       - /var/tempo:size=512m,mode=1777
   loki:
-    image: grafana/loki:3.6.0
+    image: grafana/loki:3.7.8
     profiles: [observability]
     command: ["-config.file=/etc/loki/config.yaml"]
     volumes:
@@ -72,7 +72,7 @@ services:
     tmpfs:
       - /loki:size=256m,mode=1777
   grafana:
-    image: grafana/grafana:12.3.0
+    image: grafana/grafana:12.4.13
     profiles: [observability]
     environment:
       GF_SECURITY_ADMIN_USER: admin
